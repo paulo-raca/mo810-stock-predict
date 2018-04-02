@@ -26,6 +26,8 @@ Unfortunately, the lack of real-time pricing will limit our prediction performan
 
 # Training considerations
 
+## Special days
+
 There is a really high correlation between the prices of every stock in the planet -- A company goes bankrupt in Japan, and and every US company loses market value in the next day. Therefore, we must be careful not to use the same period for both validation and training. 
 
 Also, day-of-week, day-of-month and holidays also influence the stock market. 
@@ -33,3 +35,15 @@ Also, day-of-week, day-of-month and holidays also influence the stock market.
 A possible approach would be to pick a random validation weekday for each week.
 
 More difficult and much more importantly, Quarterly Earnings Report, Product launches and scandals all cause major shifts in stock prices, and might need special handling.
+
+## Related Companies
+
+As mentioned before, the values companies influence each other: If traders are in a good mood, virtually every company will be traded a few percent higher than in the previous day. And the other way around too.
+
+But the level of influence of one company on the next changes a lot: 
+- When FB privacy scandal broke out, Google was directly affected, but 3M was not.
+- When oil prices go up, Tesla stocks go up, but Apple's are unafected.
+
+We could probably use these relationships as part of our algorithm.
+
+There are [many indexes](https://www.nasdaq.com/markets/indices/sector-indices.aspx) to cluster companies by sector (Industrial, Transportation, Oil, Technology, etc), and maybe we could even build our own.
