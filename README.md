@@ -19,6 +19,17 @@ While most of this informations is supposedly public, there is a number of obsta
 
 In face of these obstacles, we will settle for a much-simplified, easily obtained and hopefully good-enough dataset: The daily summaries of US company's performance: Open, Close, Min and Max prices, and amount of transations.
 
-This is large, well-known dataset, with several free sources. Initially, we will use [the one available on Kaggle](https://www.kaggle.com/borismarjanovic/price-volume-data-for-all-us-stocks-etfs), which despite being last-updated on November/2017, goes back several decades. We may switch for an updated dataset later on if it becomes available.
+This is large, well-known dataset, with several free sources. Initially, we will use [the one available on Kaggle](https://www.kaggle.com/borismarjanovic/price-volume-data-for-all-us-stocks-etfs), which is reasonaly up-to-date (November/2017) and goes back several decades. We may switch for an updated dataset later on if it becomes available.
 
 Unfortunately, the lack of real-time pricing will limit our prediction performance on day trading and short-term investments -- which would actually be the best possible scenario for an automatic trader, since a company's fundamentals, world economy, etc doesn't normally change within a day, even though people pay considerably different prices for a company within a day without anything special happening.
+
+
+# Training considerations
+
+There is a really high correlation between the prices of every stock in the planet -- A company goes bankrupt in Japan, and and every US company loses market value in the next day. Therefore, we must be careful not to use the same period for both validation and training. 
+
+Also, day-of-week, day-of-month and holidays also influence the stock market. 
+
+A possible approach would be to pick a random validation weekday for each week.
+
+More difficult and much more importantly, Quarterly Earnings Report, Product launches and scandals all cause major shifts in stock prices, and might need special handling.
