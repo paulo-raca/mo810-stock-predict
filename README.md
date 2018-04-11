@@ -1,6 +1,12 @@
 # mo810-stock-predict
 Stock Market Prediction
 
+# Goal
+
+Our goal is twofold:
+- Predict the stock prices of a company in the future (next day, next week, next year, etc)
+- Build an algorithm for semi-automic trading.
+
 # Dataset
 
 The ideal dataset should include, for every publicly-traded company in the world:
@@ -47,3 +53,29 @@ But the level of influence of one company on the next changes a lot:
 We could probably use these relationships as part of our algorithm.
 
 There are [many indexes](https://www.nasdaq.com/markets/indices/sector-indices.aspx) to cluster companies by sector (Industrial, Transportation, Oil, Technology, etc), and maybe we could even build our own.
+
+# Strategies
+
+## Prediction
+There are a few possible strategies to predict the stock values after a timeframe:
+- Embed the time series of the company values and any other relevant data in a the feature list and train a normal deep neural network.
+
+- Use Long short-term memory layers structure to train on the time series
+
+## Semi-automatic Trading
+
+Stock trading can be seen as an (expensive/profitable) Game.
+We could use the same Reinforcement Learning techniques tipically used to train games to obtain a good trader.
+
+It's inputs are:
+- Price history of all the companies being examined
+- Amount of shares we currently hold of each company.
+- Amount of money (Available and pending -- After a sell it takes 3 days for the money to become available)
+
+The outputs are:
+- How many shares to buy of each company (And for how much)
+- How many shares to sell of each company (And for how much)
+
+The score of a given state is given by the market value of your account.
+
+After each round (trading day), a new state is calculated performing the buy and sell operations _if the desired prices were reached_. Transaction prices and settling time are applied too.
