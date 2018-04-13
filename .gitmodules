@@ -1,0 +1,3 @@
+[submodule "dataset"]
+	path = dataset
+	url = https://github.com/paulo-raca/mo810-stock-predict-dataset
