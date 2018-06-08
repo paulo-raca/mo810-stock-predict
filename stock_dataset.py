@@ -107,7 +107,6 @@ def minibatch_producer(symbols=DEFAULT_SYMBOLS, min_date=DEFAULT_MIN_DATE, times
             samples = timeseries_at_date.sample(n = num_companies, replace = True)
             samples = samples.as_matrix(columns=samples.columns[2:])
             samples = samples.reshape([num_companies, -1, 5])
-            samples = samples.transpose((1,0,2))
             minibatch.append(samples)
         return np.stack(minibatch)
     return produce
