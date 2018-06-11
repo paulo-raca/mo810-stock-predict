@@ -9,12 +9,12 @@ class perc:
     @staticmethod
     def normalize(value, wrt=1.0, name='perc.normalize'):
         with tf.name_scope(name):
-            return 100.*(value/wrt - 1.)
+            return tf.multiply(100., value/wrt - 1., name="value")
 
     @staticmethod
     def denormalize(normalized_value, wrt=1.0, name='perc.denormalize'):
         with tf.name_scope(name):
-            return (normalized_value / 100. + 1.) * wrt
+            return tf.multiply(wrt, normalized_value / 100. + 1., name="value")
 
 class log_perc:
     """
@@ -31,10 +31,10 @@ class log_perc:
     @staticmethod
     def normalize(value, wrt=1.0, name='log_perc.normalize'):
         with tf.name_scope(name):
-            return 100.*tf.log(value/wrt)
+            return tf.multiply(100., tf.log(value/wrt), name="value")
 
     @staticmethod
     def denormalize(normalized_value, wrt=1.0, name='log_perc.denormalize'):
         with tf.name_scope(name):
-            return tf.exp(normalized_value / 100.) * wrt
+            return tf.multiply(wrt, tf.exp(normalized_value / 100.), name="value")
 
