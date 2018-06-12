@@ -11,14 +11,17 @@ DATASET_DIR = "dataset/dataset-2017-10-11"
 STOCK_DIR = f"{DATASET_DIR}/Stocks"
 ETF_DIR = f"{DATASET_DIR}/ETFs"
 
-SP500 = pd.read_csv('dataset/s&p500.tsv', sep='\t')['Ticker symbol']
-FAVORITE_COMPANIES = ['GOOG', 'AMZN', 'NFLX', 'TSLA', 'FB', 'AAPL', 'INTC', 'QCOM', 'DIS', 'NVDA']
-DEFAULT_SYMBOLS = FAVORITE_COMPANIES
+SP500 = pd.read_csv('dataset/s&p500.tsv', sep='\t')['Ticker symbol']  # The most important/most traded companies -- a.k.a. the ones be care about.
+
+DEFAULT_SYMBOLS = SP500
 DEFAULT_TEST_RATIO = 0.2
 DEFAULT_MIN_DATE = '2013-01-01'
 DEFAULT_TIMESERIES_LENGTH = 30
 
 def read_datasets(symbols=DEFAULT_SYMBOLS, min_date=DEFAULT_MIN_DATE):
+    """
+    Reads the CSV files with historic data for the given companies
+    """
     symbols = set(symbols)
     failed_csvs = []
     datasets = {}
@@ -78,6 +81,12 @@ def concat_data(datasets):
     return df.reindex(['Symbol'] + list(df.columns[:-1]), axis='columns')
 
 def train_test_split_by_date(dataset, test_ratio=DEFAULT_TEST_RATIO):
+    """
+    Split a dataset in train a test partitions
+
+    It uses the date as key (All records on the same date are either test or train).
+    The rationale behind it is that, despite large individual variation, the whole market often moves as a whole and the same changes are seen by different companies at the same day.
+    """
     trading_dates = sorted(set(dataset.Date))
     train_dates, test_dates = train_test_split(trading_dates, test_size=test_ratio)
     train_dataset = dataset[dataset.Date.isin(set(train_dates))].sample(frac=1).reset_index(drop=True)
@@ -85,6 +94,18 @@ def train_test_split_by_date(dataset, test_ratio=DEFAULT_TEST_RATIO):
     return (train_dataset, test_dataset)
 
 def minibatch_producer(symbols=DEFAULT_SYMBOLS, min_date=DEFAULT_MIN_DATE, timeseries_length=DEFAULT_TIMESERIES_LENGTH, test_ratio=DEFAULT_TEST_RATIO, minibatch_size=100, num_companies=10):
+    """
+    Loads and pre-process data from the specified companies (symbols), and returns a function to produce new minibatches.
+
+    Each minibatch is a tensor[minibatch][company][days][low, high, open, close, volume]
+
+    min_date: Any data before this is ignores -- e.g., We don't want to traing/validate with data from the 1970's
+    timeseries_length: Number of consecutive days to fetch
+    test_ratio: Ratio of data samples reserved for testing  (Data partitioning is done by date)
+    minibatch_size: Number of minibatches to produce on each call (Can be overriden on each call)
+    num_companies: Number of companies sampled on each minibatch (Can be overriden on each call)
+    """
+
     all_timeseries = concat_data(read_time_series(symbols, min_date, timeseries_length))
     train_timeseries, test_timeseries = train_test_split_by_date(all_timeseries, test_ratio=test_ratio)
 

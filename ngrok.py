@@ -14,6 +14,8 @@ class Ngrok:
     NGrok is a public service that creates tunnels from local servers, making them available over the internet.
 
     In this project, we'll use it to tunnel tensorboard running inside a Colaboratory server to a public address that can be accessed outside the Jupyter frontend
+
+    FIXME: While it does work, the link seems to break after a few minutes :/
     """
     def __init__(self, *args):
         self.args = args
