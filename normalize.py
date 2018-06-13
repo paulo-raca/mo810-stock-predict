@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+eps = 1e-6
 class perc:
     """
     Calculates the percentage difference of a value with respect to a reference.
@@ -9,7 +10,7 @@ class perc:
     @staticmethod
     def normalize(value, wrt=1.0, name='perc.normalize'):
         with tf.name_scope(name):
-            return tf.multiply(100., value/wrt - 1., name="value")
+            return tf.multiply(100., value/tf.maximum(wrt, eps) - 1., name="value")
 
     @staticmethod
     def denormalize(normalized_value, wrt=1.0, name='perc.denormalize'):
@@ -31,7 +32,7 @@ class log_perc:
     @staticmethod
     def normalize(value, wrt=1.0, name='log_perc.normalize'):
         with tf.name_scope(name):
-            return tf.multiply(100., tf.log(value/wrt), name="value")
+            return tf.multiply(100., tf.log(tf.maximum(value, eps)/tf.maximum(wrt, eps)), name="value")
 
     @staticmethod
     def denormalize(normalized_value, wrt=1.0, name='log_perc.denormalize'):
