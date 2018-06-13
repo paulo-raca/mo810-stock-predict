@@ -12,6 +12,7 @@ STOCK_DIR = f"{DATASET_DIR}/Stocks"
 ETF_DIR = f"{DATASET_DIR}/ETFs"
 
 SP500 = pd.read_csv('dataset/s&p500.tsv', sep='\t')['Ticker symbol']  # The most important/most traded companies -- a.k.a. the ones be care about.
+FAVORITE_COMPANIES = ['GOOG', 'AMZN', 'NFLX', 'TSLA', 'FB', 'AAPL', 'INTC', 'QCOM', 'DIS', 'NVDA']
 
 DEFAULT_SYMBOLS = SP500
 DEFAULT_TEST_RATIO = 0.2
@@ -80,17 +81,18 @@ def concat_data(datasets):
     )
     return df.reindex(['Symbol'] + list(df.columns[:-1]), axis='columns')
 
-def train_test_split_by_date(dataset, test_ratio=DEFAULT_TEST_RATIO):
+def train_test_split_by_symbol(dataset, test_ratio=DEFAULT_TEST_RATIO):
     """
     Split a dataset in train a test partitions
 
     It uses the date as key (All records on the same date are either test or train).
     The rationale behind it is that, despite large individual variation, the whole market often moves as a whole and the same changes are seen by different companies at the same day.
     """
-    trading_dates = sorted(set(dataset.Date))
-    train_dates, test_dates = train_test_split(trading_dates, test_size=test_ratio)
-    train_dataset = dataset[dataset.Date.isin(set(train_dates))].sample(frac=1).reset_index(drop=True)
-    test_dataset = dataset[dataset.Date.isin(set(test_dates))].sample(frac=1).reset_index(drop=True)
+    all_symbols = sorted(set(dataset.Symbol))
+    train_symbols, test_symbols = train_test_split(all_symbols, test_size=test_ratio)
+    logger.warning(f'Train/Test split: {train_symbols} / {test_symbols}')
+    train_dataset = dataset[dataset.Symbol.isin(set(train_symbols))].sample(frac=1).reset_index(drop=True)
+    test_dataset = dataset[dataset.Symbol.isin(set(test_symbols))].sample(frac=1).reset_index(drop=True)
     return (train_dataset, test_dataset)
 
 def minibatch_producer(symbols=DEFAULT_SYMBOLS, min_date=DEFAULT_MIN_DATE, timeseries_length=DEFAULT_TIMESERIES_LENGTH, test_ratio=DEFAULT_TEST_RATIO, minibatch_size=100, num_companies=10):
@@ -107,7 +109,7 @@ def minibatch_producer(symbols=DEFAULT_SYMBOLS, min_date=DEFAULT_MIN_DATE, times
     """
 
     all_timeseries = concat_data(read_time_series(symbols, min_date, timeseries_length))
-    train_timeseries, test_timeseries = train_test_split_by_date(all_timeseries, test_ratio=test_ratio)
+    train_timeseries, test_timeseries = train_test_split_by_symbol(all_timeseries, test_ratio=test_ratio)
 
     def produce(set=None, minibatch_size=minibatch_size, num_companies=num_companies):
         if set == 'train':
