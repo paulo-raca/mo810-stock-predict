@@ -117,7 +117,8 @@ def minibatch_producer(symbols=DEFAULT_SYMBOLS, min_date=DEFAULT_MIN_DATE, times
 
     all_timeseries = concat_data(read_time_series(symbols, min_date, timeseries_length))
     train_timeseries, test_timeseries = train_test_split_by_symbol(all_timeseries, test_ratio=test_ratio)
-    train_timeseries, test_timeseries = split_timeseries_by_date(train_timeseries), split_timeseries_by_date(test_timeseries)
+
+    all_timeseries, train_timeseries, test_timeseries = split_timeseries_by_date(all_timeseries), split_timeseries_by_date(train_timeseries), split_timeseries_by_date(test_timeseries)
 
     def produce(set=None, minibatch_size=minibatch_size, num_companies=num_companies):
         if set == 'train':
