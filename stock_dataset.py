@@ -108,8 +108,16 @@ def minibatch_producer(symbols=DEFAULT_SYMBOLS, min_date=DEFAULT_MIN_DATE, times
     num_companies: Number of companies sampled on each minibatch (Can be overriden on each call)
     """
 
+    def split_timeseries_by_date(timeseries):
+        dates = set(timeseries.Date)
+        return {
+            date: timeseries[timeseries.Date == date]
+            for date in dates
+        }
+
     all_timeseries = concat_data(read_time_series(symbols, min_date, timeseries_length))
     train_timeseries, test_timeseries = train_test_split_by_symbol(all_timeseries, test_ratio=test_ratio)
+    train_timeseries, test_timeseries = split_timeseries_by_date(train_timeseries), split_timeseries_by_date(test_timeseries)
 
     def produce(set=None, minibatch_size=minibatch_size, num_companies=num_companies):
         if set == 'train':
@@ -124,8 +132,8 @@ def minibatch_producer(symbols=DEFAULT_SYMBOLS, min_date=DEFAULT_MIN_DATE, times
         minibatch = []
         for i in range(minibatch_size):
             #print(len(timeseries.Date[10983]))
-            date = random.choice(list(timeseries.Date))
-            timeseries_at_date = timeseries[timeseries.Date == date]
+            date = random.choice(list(timeseries.keys()))
+            timeseries_at_date = timeseries[date]
 
             samples = timeseries_at_date.sample(n = num_companies, replace = True)
             samples = samples.as_matrix(columns=samples.columns[2:])
