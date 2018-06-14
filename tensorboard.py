@@ -112,8 +112,7 @@ class Server:
                 raise Exception("tensorboard didn't bind to a local address!?")
 
             self.ngrok = ngrok.Http(host=self.host, port=self.port)
-            self.private_url = f'http://{self.port}:{self.port}'
-            self.public_url = self.ngrok.public_url
+            self.private_url = f'http://{self.host}:{self.port}'
 
             logging.debug(f'TensorBoard running at {self.public_url}')
 
@@ -127,6 +126,10 @@ class Server:
     @property
     def runs(self):
         return os.listdir(self.logdir)
+
+    @property
+    def public_url(self):
+        return self.ngrok.public_url
 
     def run_url(self, run):
         return f'{self.public_url}?run={run}'
